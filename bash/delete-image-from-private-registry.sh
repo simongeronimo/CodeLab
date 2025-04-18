@@ -6,9 +6,15 @@ imageSelected=""
 versionSelected=""
 
 # ========== Functions ==========
+get_homelab_registry_default() {
+    tailscale_homelab_ip=$(tailscale ip --4 homelab)
+    registry_service_port=$(kubectl get svc --namespace registry -o jsonpath="{.items[0].spec.ports[0].nodePort}")
+    registry_ip="$tailscale_homelab_ip:$registry_service_port"
+}
 get_registry_address() {
-    echo -e "Enter the ip address and port of the private registry (XXX.XX.XX.XXX:PPPPP):"
-    read -p "" registry_ip
+    echo -e "Enter the IP address and port of the private registry (XXX.XX.XX.XXX:PPPPP) \n[Press Enter to use your homelab default]:"
+    read -p "" registry_ip_manual
+    registry_ip=${registry_ip_manual:-$registry_ip}
     echo "You have entered the following address: $registry_ip"
 }
 
@@ -43,6 +49,7 @@ delete_image() {
 }
 
 main() {
+    get_homelab_registry_default
     get_registry_address
 
     if ! select_from_available_images; then
