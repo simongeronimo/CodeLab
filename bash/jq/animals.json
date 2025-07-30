@@ -1,0 +1,39 @@
+{
+  "animals": [
+    {
+      "name": "Elephant",
+      "color": "Gray",
+      "size": "Large",
+      "habitat": "Savannah",
+      "foods": ["Grass", "Fruits", "Bark"]
+    },
+    {
+      "name": "Frog",
+      "color": "Green",
+      "size": "Small",
+      "habitat": "Forest",
+      "foods": ["Insects", "Worms", "Small fish"]
+    },
+    {
+      "name": "Parrot",
+      "color": "Red",
+      "size": "Small",
+      "habitat": "Rainforest",
+      "foods": ["Seeds", "Fruits", "Nectar"]
+    },
+    {
+      "name": "Lion",
+      "color": "Golden",
+      "size": "Large",
+      "habitat": "Savannah",
+      "foods": ["Meat", "Bones", "Small mammals"]
+    },
+    {
+      "name": "Penguin",
+      "color": "Black and White",
+      "size": "Medium",
+      "habitat": "Antarctica",
+      "foods": ["Fish", "Krill", "Squid"]
+    }
+  ]
+}
