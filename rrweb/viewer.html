@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Viewer Screen</title>
+    <script src="./rrweb.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background: #222;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            padding: 15px;
+            background: #111;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        #screen-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        #screen-wrapper {
+            background: white;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* height is set dynamically by JS after iframe loads */
+        }
+        #screen-wrapper iframe {
+            display: block;
+            pointer-events: none;
+            width: 100% !important;
+            /* height is also set dynamically */
+        }
+    </style>
+</head>
+<body>
+    <div id="screen-container">
+        <div id="screen-wrapper"></div>
+    </div>
+
+    <script>
+        let currentPlayer = null;
+
+        function fitWrapperToContent() {
+            const wrapper = document.getElementById('screen-wrapper');
+            if (!wrapper) return;
+
+            const iframe = wrapper.querySelector('iframe');
+            if (!iframe) return;
+
+            try {
+                // Read the full scrollable height of the page inside the iframe
+                const innerHeight = iframe.contentDocument.documentElement.scrollHeight
+                    || iframe.contentDocument.body.scrollHeight;
+
+                if (innerHeight && innerHeight > 0) {
+                    // Make the iframe and wrapper exactly as tall as the inner page
+                    iframe.style.height = innerHeight + 'px';
+                    wrapper.style.height = innerHeight + 'px';
+                }
+            } catch (e) {
+                // Cross-origin iframe — fallback: use the rrweb recorded viewport height
+                const meta = iframe.style.height;
+                if (meta) wrapper.style.height = meta;
+            }
+        }
+
+        function loadSnapshot(dataString) {
+            if (!dataString) return;
+
+            let events;
+            try {
+                events = JSON.parse(dataString);
+            } catch (e) {
+                console.error("Failed to parse rrweb data:", e);
+                return;
+            }
+
+            if (!events || events.length === 0) return;
+
+            // Fresh root every time
+            const screenContainer = document.getElementById('screen-container');
+            screenContainer.innerHTML = '<div id="screen-wrapper"></div>';
+            const screenWrapper = document.getElementById('screen-wrapper');
+
+            currentPlayer = new rrweb.Replayer(events, {
+                root: screenWrapper,
+                liveMode: true,
+                mouseTail: false
+            });
+
+            currentPlayer.startLive(events[0].timestamp);
+
+            // Wait for rrweb to finish painting into the iframe, then resize
+            setTimeout(fitWrapperToContent, 300);
+            // Second pass in case images/fonts shift the height slightly
+            setTimeout(fitWrapperToContent, 800);
+
+        }
+
+        loadSnapshot(localStorage.getItem('rrweb_sandbox'));
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'rrweb_sandbox') {
+                loadSnapshot(event.newValue);
+            }
+        });
+    </script>
+</body>
+</html>

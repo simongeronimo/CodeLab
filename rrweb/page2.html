@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Host: Page 2</title>
+    <script src="./rrweb.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding-top: 60px; background: #eef9ff; } /* Blue background */
+        .toolbar { position: fixed; top: 0; left: 0; width: 100%; background: #0056b3; padding: 15px; color: white; display: flex; gap: 20px; align-items: center; }
+        .content { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .block { height: 400px; margin-bottom: 20px; background: #fff; border: 2px solid #0056b3; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #0056b3; }
+        button { background: #ffcc00; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; }
+        a { color: #ffcc00; }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <strong>Host: Page 2</strong>
+        <button onclick="syncData()">Sync to Viewer</button>
+        <a href="page1.html">⬅ Go back to Page 1</a>
+    </div>
+
+    <div class="content">
+        <h1>You made it to Page 2!</h1>
+        <p>Notice how the viewer updated automatically?</p>
+        <div class="block">Section X</div>
+        <div class="block">Section Y</div>
+        <div class="block">Section Z</div>
+    </div>
+
+    <script>
+        let events = [];
+        rrweb.record({
+            emit(event) {
+                if (event.type === 3 && (event.data.source === 1 || event.data.source === 2)) return;
+                events.push(event);
+            }
+        });
+
+        function syncData() {
+            localStorage.setItem('rrweb_sandbox', JSON.stringify(events));
+        }
+        
+        setTimeout(syncData, 500);
+    </script>
+</body>
+</html>
